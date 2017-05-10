@@ -1,0 +1,84 @@
+---
+# tasks file for ansible-role-redhat_localrepo
+
+# - debug:
+#     var: redhat_localrepo
+#   tags:
+#     - debug
+
+- name: register to Red Hat Content Delivery Network
+  redhat_subscription:
+    state: present 
+    username: "{{ redhat_localrepo.rhn_username }}" 
+    password: "{{ redhat_localrepo.rhn_password }}"
+    autosubscribe: "{{ redhat_localrepo.autosubscribe }}"
+
+- shell: "subscription-manager repos --list | grep 'Repo ID' | sort"
+  register: command_result
+
+- name: display result of command "subscription-manager repos --list"
+  debug:
+    var: command_result.stdout_lines
+
+# - name: disable all repository
+#   shell: subscription-manager repos --disable=*
+
+- name: active repositories for system upgrade & installing web server
+  shell: "subscription-manager repos --enable={{ item }}"
+  with_items:
+    - "rhel-server-rhscl-7-eus-rpms"
+
+- name: upgrade all packages
+  yum: name=* state=latest
+  ignore_errors: yes
+
+- name: install packages for building local repository
+  yum: 
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - 'bash-completion'
+    - 'yum-utils'
+    - 'createrepo'
+    - 'nginx14'
+    - 'libselinux-python'
+
+- name: create director for storing packages
+  file:
+    path: '{{ redhat_localrepo.web_root_dir }}'
+    state: directory
+    mode: 0755
+
+- name: disable SELinux
+  selinux:
+    state: disabled
+
+- name: copy nginx configuration
+  template: 
+    src: templates/nginx.localrepo.conf.j2
+    dest: /opt/rh/nginx14/root/etc/nginx/conf.d/localrepo.conf
+
+- name: restart nginx14-nginx.service
+  service: name=nginx14-nginx.service state=restarted
+
+- name: stop firewalld.service
+  service: name=firewalld.service state=stopped
+
+- name: copy script for synchronizing packages
+  template: 
+    src: templates/sync_repo.sh.j2
+    dest: /root/sync_repo.sh
+
+- name: add cron job for sync repo
+  cron:
+    name: "sync repo"
+    minute: "0"
+    hour: "22"
+    job: "bash /root/sync_repo.sh > /tmp/sync_repo.log 2>&1"
+
+- name: unregister Red Hat Content Delivery Network
+  command: '{{ item }}'
+  with_items:
+    - 'subscription-manager remove --all'
+    - 'subscription-manager unregister'
+    - 'subscription-manager clean'

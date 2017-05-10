@@ -1,0 +1,11 @@
+#!/bin/bash
+
+subscription-manager register --username={{ redhat_localrepo.rhn_username }} --password={{ redhat_localrepo.rhn_password }} --auto-attach
+
+{% for item in redhat_localrepo.repos %}
+reposync --gpgcheck -l --repoid={{ item }} --download_path={{ redhat_localrepo.web_root_dir }} --downloadcomps --download-metadata
+{% endfor %}
+
+subscription-manager remove --all
+subscription-manager unregister
+subscription-manager clean

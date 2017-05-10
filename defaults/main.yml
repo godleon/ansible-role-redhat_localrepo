@@ -1,0 +1,21 @@
+---
+# defaults file for ansible-role-redhat_localrepo
+
+redhat_localrepo:
+  # Red Hat Portal username
+  rhn_username: "{{ lookup('env', 'RHN_USERNAME') }}"
+  # Red Hat Portal password
+  rhn_password: "{{ lookup('env', 'RHN_PASSWORD') }}"
+  # Whether or not to autosubscibe to available repositories.
+  autosubscribe: true
+  # repositories to mirror
+  repos:
+    - "rhel-7-server-rpms"
+    - "rhel-7-server-extras-rpms"
+  # root directory for storing packages
+  web_root_dir: '/var/www/html'
+  # port to listen
+  web_server_port: 80
+  # execution time of daily cron job
+  daily_sync_hour: 22
+  daily_sync_minute: 0

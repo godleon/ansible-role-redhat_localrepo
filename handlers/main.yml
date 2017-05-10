@@ -1,0 +1,4 @@
+---
+# handlers file for ansible-role-redhat_localrepo
+- name: restart nginx14-nginx.service
+  service: name=nginx14-nginx state=restarted
