@@ -1,13 +1,5 @@
 #!/bin/bash
 
-env
-
-echo $1
-
-echo $2
-
-subscription-manager register --username='$1' --password='$2'
-
 for pid in $(subscription-manager list --available | grep Pool | cut -d':' -f2 | tr -d ' \t'); do subscription-manager attach --pool=$pid; done
 
 subscription-manager repos --list | grep "Repo ID" | sort
