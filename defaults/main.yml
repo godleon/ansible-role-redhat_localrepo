@@ -13,7 +13,7 @@ redhat_localrepo:
     - "rhel-7-server-openstack-10-tools-rpms"
     - "rhel-7-server-rhv-4-tools-rpms"
   # root directory for storing packages
-  web_root_dir: "{{ lookup('env', 'WEB_ROOT_DIR') }}"
+  web_root_dir: /var/www/html
   # port to listen
   web_server_port: 80
   # execution time of daily cron job
