@@ -1,11 +1,6 @@
 ---
 # tasks file for ansible-role-redhat_localrepo
 
-# - debug:
-#     var: redhat_localrepo
-#   tags:
-#     - debug
-
 - name: register to Red Hat Content Delivery Network
   redhat_subscription:
     state: present 
@@ -13,24 +8,28 @@
     password: "{{ redhat_localrepo.rhn_password }}"
     autosubscribe: "{{ redhat_localrepo.autosubscribe }}"
 
+- shell: "find /etc/pki/rpm-gpg"
+  tags:
+    - debug
+
 - shell: "subscription-manager repos --list | grep 'Repo ID' | sort"
   register: command_result
+  tags:
+    - debug
 
 - name: display result of command "subscription-manager repos --list"
   debug:
     var: command_result.stdout_lines
-
-# - name: disable all repository
-#   shell: subscription-manager repos --disable=*
+  tags:
+    - debug
 
 - name: active repositories for system upgrade & installing web server
-  shell: "subscription-manager repos --enable={{ item }}"
-  with_items:
-    - "rhel-server-rhscl-7-eus-rpms"
+  shell: "subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-server-rhscl-7-eus-rpms"
 
 - name: upgrade all packages
   yum: name=* state=latest
   ignore_errors: yes
+  when: ansible_virtualization_type != 'docker'
 
 - name: install packages for building local repository
   yum: 
@@ -85,6 +84,10 @@
     minute: "{{ redhat_localrepo.daily_sync_minute }}"
     hour: "{{ redhat_localrepo.daily_sync_hour }}"
     job: "bash /root/sync_repo.sh > /tmp/sync_repo.log 2>&1"
+
+- name: test sync repo in TravisCI
+  shell: "bash /root/sync_repo.sh"
+  when: ansible_virtualization_type == 'docker'
 
 - name: unregister Red Hat Content Delivery Network
   command: '{{ item }}'
