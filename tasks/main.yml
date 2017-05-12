@@ -1,6 +1,16 @@
 ---
 # tasks file for ansible-role-redhat_localrepo
 
+- debug:
+    var: redhat_localrepo
+  tags:
+    - debug
+
+- debug:
+    var: redhat_localrepo.rhn_username
+  tags:
+    - debug
+
 - name: register to Red Hat Content Delivery Network
   redhat_subscription:
     state: present 
@@ -8,20 +18,20 @@
     password: "{{ redhat_localrepo.rhn_password }}"
     autosubscribe: "{{ redhat_localrepo.autosubscribe }}"
 
-- shell: "find /etc/pki/rpm-gpg"
-  tags:
-    - debug
+# - shell: "find /etc/pki/rpm-gpg"
+#   tags:
+#     - debug
 
-- shell: "subscription-manager repos --list | grep 'Repo ID' | sort"
-  register: command_result
-  tags:
-    - debug
+# - shell: "subscription-manager repos --list | grep 'Repo ID' | sort"
+#   register: command_result
+#   tags:
+#     - debug
 
-- name: display result of command "subscription-manager repos --list"
-  debug:
-    var: command_result.stdout_lines
-  tags:
-    - debug
+# - name: display result of command "subscription-manager repos --list"
+#   debug:
+#     var: command_result.stdout_lines
+#   tags:
+#     - debug
 
 - name: active repositories for system upgrade & installing web server
   shell: "subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-server-rhscl-7-eus-rpms"
