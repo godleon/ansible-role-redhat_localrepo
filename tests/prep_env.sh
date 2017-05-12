@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Test!"
+
 subscription-manager register --username='$1' --password='$2'
 
 for pid in $(subscription-manager list --available | grep Pool | cut -d':' -f2 | tr -d ' \t'); do subscription-manager attach --pool=$pid; done
