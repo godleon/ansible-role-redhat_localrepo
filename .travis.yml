@@ -26,21 +26,7 @@ script:
 
   - 'docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} registry.access.redhat.com/rhel7.3 "${init}" > "${container_id}"'
 
-  - 'docker exec --tty "$(cat ${container_id})" subscription-manager register --username="${RHN_USERNAME}" --password="${RHN_PASSWORD}" --auto-attach'
-
-  - 'for pid in $(subscription-manager list --available | grep Pool | cut -d: -f2 | tr -d " \t"); do subscription-manager attach --pool=$pid; done'
-
-  - 'docker exec --tty "$(cat ${container_id})" subscription-manager repos --list | grep "Repo ID" | sort'
-
-  - 'docker exec --tty "$(cat ${container_id})" subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-openstack-10-rpms'
-
-  - 'docker exec --tty "$(cat ${container_id})" yum -y install ansible'
-
-  - 'docker exec --tty "$(cat ${container_id})" subscription-manager remove --all'
-
-  - 'docker exec --tty "$(cat ${container_id})" subscription-manager unregister'
-
-  - 'docker exec --tty "$(cat ${container_id})" subscription-manager clean'
+  - 'docker exec --tty "$(cat ${container_id})" bash /etc/ansible/roles/role_under_test/tests/prep_env.sh'
 
   - 'docker exec --tty "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check'
 
