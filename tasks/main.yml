@@ -69,11 +69,21 @@
     src: templates/sync_repo.sh.j2
     dest: /root/sync_repo.sh
 
+- name: check if GPG key for beta exists
+  stat:
+    path: /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta
+  register: st
+- name: import GPG key for beta repository
+  rpm_key:
+    state: present
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-beta
+  when: st.stat.exists
+
 - name: add cron job for sync repo
   cron:
     name: "sync repo"
-    minute: "0"
-    hour: "22"
+    minute: "{{ redhat_localrepo.daily_sync_minute }}"
+    hour: "{{ redhat_localrepo.daily_sync_hour }}"
     job: "bash /root/sync_repo.sh > /tmp/sync_repo.log 2>&1"
 
 - name: unregister Red Hat Content Delivery Network

@@ -26,7 +26,11 @@ script:
 
   - 'docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} registry.access.redhat.com/rhel7.3 "${init}" > "${container_id}"'
 
-  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install -f -r /etc/ansible/roles/role_under_test/tests/requirements.yml'
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm subscription-manager register --username='${RHN_USERNAME}' --password='${rhn_password}' --auto-attach'
+
+  - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm subscription-manager remove --all && subscription-manager unregister $$ subscription-manager clean'
+
+  - exit 0
 
   - 'docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check'
 
