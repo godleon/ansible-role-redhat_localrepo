@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/godleon/ansible-role-redhat_localrepo.svg?branch=master)](https://travis-ci.org/godleon/ansible-role-redhat_localrepo)
+
 Role Name
 =========
 
@@ -6,7 +8,8 @@ Role Name
 Requirements
 ------------
 
-None
+Your Red Hat subscription should have **rhel-7-server-rpms** and **rhel-server-rhscl-7-eus-rpms** available for installing Ansible and nginx.
+
 
 Role Variables
 --------------
