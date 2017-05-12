@@ -1,6 +1,10 @@
 #!/bin/bash
 
-echo "Test!"
+env
+
+echo $1
+
+echo $2
 
 subscription-manager register --username='$1' --password='$2'
 
