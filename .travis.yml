@@ -26,7 +26,11 @@ script: >
 
   docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} registry.access.redhat.com/rhel7.3 "${init}" > "${container_id}"
 
-  echo ${WEB_ROOT_DIR}
+  docker exec --tty ${container_id} subscription-manager register --username="${RHN_USERNAME}" --password="${RHN_PASSWORD}"
+
+  docker exec --tty ${container_id} bash /etc/ansible/roles/role_under_test/tests/prep_env.sh
+
+  docker exec --tty ${container_id} ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check
 
 
 notifications:
