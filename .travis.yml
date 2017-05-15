@@ -33,6 +33,8 @@ script: >
 
   #docker exec --tty $(cat ${container_id}) bash /etc/ansible/roles/role_under_test/tests/prep_env.sh
 
+  docker exec --tty $(cat ${container_id}) env
+
   docker exec --tty $(cat ${container_id}) ANSIBLE_HASH_BEHAVIOUR="merge"
 
   docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check
