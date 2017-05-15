@@ -18,28 +18,28 @@ services:
   - docker
 
 before_install:
-  - docker pull williamyeh/ansible:ubuntu16.04
+  docker pull williamyeh/ansible:ubuntu16.04
   #- 'docker pull registry.access.redhat.com/rhel7.3'
 
-script:
+script: >
   
-  - container_id=$(mktemp)
+  container_id=$(mktemp)
 
   #docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} registry.access.redhat.com/rhel7.3 "${init}" > "${container_id}"
 
-  - docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} -e "ANSIBLE_HASH_BEHAVIOUR=merge" williamyeh/ansible:ubuntu16.04 "${init}" > "${container_id}"
+  docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} -e "ANSIBLE_HASH_BEHAVIOUR=merge" williamyeh/ansible:ubuntu16.04 "${init}" > "${container_id}"
 
   #docker exec --tty $(cat ${container_id}) subscription-manager register --username="${RHN_USERNAME}" --password="${RHN_PASSWORD}"
 
   #docker exec --tty $(cat ${container_id}) bash /etc/ansible/roles/role_under_test/tests/prep_env.sh
 
-  - docker exec --tty $(cat ${container_id}) env
+  docker exec --tty $(cat ${container_id}) env
 
-  - docker exec --tty $(cat ${container_id}) find /etc/ansible/roles -maxdepth 2
+  docker exec --tty $(cat ${container_id}) find /etc/ansible/roles -maxdepth 2
 
-  - docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check
+  docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check
 
-  - docker exec --tty $(cat ${container_id}) ansible-playbook -i /etc/ansible/roles/role_under_test/tests/inventory /etc/ansible/roles/role_under_test/tests/${playbook} --extra-vars '{ \"redhat_localrepo\": { \"rhn_username\": \"${RHN_USERNAME}\", \"rhn_password\": \"${RHN_PASSWORD}\" }}' --tags "debug" --connection=local --sudo
+  docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} --extra-vars '{ redhat_localrepo: { rhn_username: "${RHN_USERNAME}" }}' --extra-vars '{ redhat_localrepo: { rhn_password: "${RHN_PASSWORD}" }}' --connection=local --sudo
 
   #- docker exec --tty $(cat ${container_id}) du -h -d 1 ${WEB_ROOT_DIR}
   
