@@ -18,17 +18,17 @@ before_install:
 
 script: >
   
-  container_id=$(mktemp)
+  - container_id=$(mktemp)
 
-  docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} -e "ANSIBLE_HASH_BEHAVIOUR=merge" -e "RHN_USERNAME=${RHN_USERNAME}" -e "RHN_PASSWORD=${RHN_PASSWORD}" registry.access.redhat.com/rhel7.3 "${init}" > "${container_id}"
+  - docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} -e "ANSIBLE_HASH_BEHAVIOUR=merge" -e "RHN_USERNAME=${RHN_USERNAME}" -e "RHN_PASSWORD=${RHN_PASSWORD}" registry.access.redhat.com/rhel7.3 "${init}" > "${container_id}"
 
-  docker exec --tty $(cat ${container_id}) bash /etc/ansible/roles/role_under_test/tests/prep_env.sh
+  - docker exec --tty $(cat ${container_id}) bash /etc/ansible/roles/role_under_test/tests/prep_env.sh
 
-  docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check
+  - docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} -i /etc/ansible/roles/role_under_test/tests/inventory --syntax-check
 
-  docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} --connection=local --sudo
+  - docker exec --tty $(cat ${container_id}) ansible-playbook /etc/ansible/roles/role_under_test/tests/${playbook} --connection=local --sudo
 
-  docker exec --tty $(cat ${container_id}) du -h -d 1 ${WEB_ROOT_DIR}
+  - docker exec --tty $(cat ${container_id}) du -h -d 1 ${WEB_ROOT_DIR}
   
 
 notifications:
