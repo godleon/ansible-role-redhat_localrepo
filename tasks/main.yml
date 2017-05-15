@@ -60,6 +60,7 @@
 
 - name: stop firewalld.service
   service: name=firewalld.service state=stopped
+  when: ansible_virtualization_type != 'docker'
 
 - name: copy script for synchronizing packages
   template: 
