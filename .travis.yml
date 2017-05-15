@@ -16,7 +16,7 @@ services:
 before_install:
   - 'docker pull registry.access.redhat.com/rhel7.3'
 
-script: >
+script:
   
   - container_id=$(mktemp)
 
