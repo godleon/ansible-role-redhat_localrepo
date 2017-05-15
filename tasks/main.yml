@@ -83,6 +83,7 @@
     minute: "{{ redhat_localrepo.daily_sync_minute }}"
     hour: "{{ redhat_localrepo.daily_sync_hour }}"
     job: "bash /root/sync_repo.sh > /tmp/sync_repo.log 2>&1"
+  when: ansible_virtualization_type != 'docker'
 
 - name: test sync repo in TravisCI
   shell: "bash /root/sync_repo.sh"
