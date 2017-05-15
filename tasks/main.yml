@@ -3,11 +3,13 @@
 
 - debug:
     var: redhat_localrepo
+  when: ansible_virtualization_type != 'docker'
   tags:
     - debug
 
 - debug:
     var: redhat_localrepo.rhn_username
+  when: ansible_virtualization_type != 'docker'
   tags:
     - debug
 
@@ -17,21 +19,6 @@
     username: "{{ redhat_localrepo.rhn_username }}" 
     password: "{{ redhat_localrepo.rhn_password }}"
     autosubscribe: "{{ redhat_localrepo.autosubscribe }}"
-
-# - shell: "find /etc/pki/rpm-gpg"
-#   tags:
-#     - debug
-
-# - shell: "subscription-manager repos --list | grep 'Repo ID' | sort"
-#   register: command_result
-#   tags:
-#     - debug
-
-# - name: display result of command "subscription-manager repos --list"
-#   debug:
-#     var: command_result.stdout_lines
-#   tags:
-#     - debug
 
 - name: active repositories for system upgrade & installing web server
   shell: "subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-server-rhscl-7-eus-rpms"
@@ -61,6 +48,7 @@
 - name: disable SELinux
   selinux:
     state: disabled
+  when: ansible_virtualization_type != 'docker'
 
 - name: copy nginx configuration
   template: 
