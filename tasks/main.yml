@@ -93,5 +93,4 @@
   command: '{{ item }}'
   with_items:
     - 'subscription-manager remove --all'
-    - 'subscription-manager unregister'
     - 'subscription-manager clean'
