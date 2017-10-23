@@ -39,28 +39,40 @@
     - 'nginx14'
     - 'libselinux-python'
 
+
 - name: create director for storing packages
   file:
     path: '{{ redhat_localrepo.web_root_dir }}'
     state: directory
     mode: 0755
 
+
 - name: disable SELinux
   selinux:
     state: disabled
   when: ansible_virtualization_type != 'docker'
+
 
 - name: copy nginx configuration
   template: 
     src: templates/nginx.localrepo.conf.j2
     dest: /opt/rh/nginx14/root/etc/nginx/conf.d/localrepo.conf
 
-- name: restart nginx14-nginx.service
-  service: name=nginx14-nginx.service state=restarted
 
-- name: stop firewalld.service
-  service: name=firewalld.service state=stopped
+- name: "restart nginx14-nginx.service"
+  service: 
+    name: nginx14-nginx.service
+    state: restarted
+    enabled: yes
+
+
+- name: "stop & disable firewalld.service"
+  service: 
+    name: firewalld.service
+    state: stopped
+    enabled: no
   when: ansible_virtualization_type != 'docker'
+
 
 - name: copy script for synchronizing packages
   template: 
